@@ -28,9 +28,6 @@ spl_autoload_register(function ($class) {
 
 session_start();
 
-$app = new \App\Main();
-$app->init();
-
 // Create Router instance
 $router = new \Bramus\Router\Router();
 
@@ -51,20 +48,19 @@ $router->options("/.*", function() {
 sendCorsHeaders();
 
 // Custom 404 Handler
-$router->set404(function() use ($app) {
-    $controller = new \App\Controllers\ErrorsController($app);
+$router->set404(function() {
+    $controller = new \App\Controllers\ErrorsController();
     $controller->notFound();
 });
 
 // Check authentication
-$router->before("POST|DELETE", "/.*", function() {
+$router->before("POST|PUT|DELETE", "/.*", function() {
     requireAuth();
-    updateUserLastActiveTime();
 });
 
 // Define API routes
-$router->mount("/oauth", function() use ($router, $app) {
-    $controller = new \App\Controllers\OAuthController($app);
+$router->mount("/oauth", function() use ($router) {
+    $controller = new \App\Controllers\OAuthController();
 
     $router->get("/initiate", function() use ($controller) {
         $controller->goToGithub();
@@ -78,6 +74,38 @@ $router->mount("/oauth", function() use ($router, $app) {
     //     $controller->logout();
     // });
 });
+
+// $router->mount("/snippets", function() use ($router) {
+//     $controller = new \App\Controllers\SnippetController();
+
+//     $router->get("/", function() use ($controller) {
+//         requireAuth();
+//         $controller->listOwnSnippets();
+//     });
+
+//     $router->post("/", function() use ($controller) {
+//         $controller->createSnippet();
+//     });
+//     $router->get("/(.*)", function($snippetId) use ($controller) {
+//         $controller->getSnippet($snippetId);
+//     });
+//     $router->put("/(.*)", function($snippetId) use ($controller) {
+//         $controller->updateSnippet($snippetId);
+//     });
+//     $router->delete("/(.*)", function($snippetId) use ($controller) {
+//         $controller->deleteSnippet($snippetId);
+//     });
+
+//     $router->post("/(.*)/comments", function($snippetId) use ($controller) {
+//         $controller->addComment($snippetId);
+//     });
+//     $router->put("/(.*)/comments/(.*)", function($snippetId, $commentId) use ($controller) {
+//         $controller->updateComment($snippetId, $commentId);
+//     });
+//     $router->delete("/(.*)/comments/(.*)", function($snippetId, $commentId) use ($controller) {
+//         $controller->deleteComment($snippetId, $commentId);
+//     });
+// });
 
 
 $router->run();
@@ -93,9 +121,9 @@ function requireAuth() {
     // }
 }
 
-function updateUserLastActiveTime() {
-    if (isset($_SESSION["USER"])) {
-        $usersDAO = new \App\DAO\UsersDAO();
-        $usersDAO->setLastActiveTime($_SESSION["USER"]["email"], time());
-    }
-}
+// function updateUserLastActiveTime() {
+//     if (isset($_SESSION["USER"])) {
+//         $usersDAO = new \App\DAO\UsersDAO();
+//         $usersDAO->setLastActiveTime($_SESSION["USER"]["email"], time());
+//     }
+// }
