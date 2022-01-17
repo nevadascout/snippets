@@ -17,6 +17,35 @@ class OAuthController extends BaseController
 
     public function callback()
     {
+        if (isset($_GET["error"])) {
+            return;
+        }
+
+        if (isset($_GET["state"]) && isset($_GET["code"])) {
+            $state = $_GET["state"];
+            $code = $_GET["code"];
+
+            if (isset($_SESSION["GITHUB_AUTH_STATE"])) {
+                $savedState = $_SESSION["GITHUB_AUTH_STATE"];
+                unset($_SESSION["GITHUB_AUTH_STATE"]);
+
+                if ($state === $savedState) {
+                    $postData = array(
+                        "client_id" => $_ENV["GITHUB_CLIENT_ID"],
+                        "client_secret" => $_ENV["GITHUB_CLIENT_SECRET"],
+                        "code" => $code,
+                        "redirect_uri" => $_ENV["OAUTH_REDIRECT_URI"]
+                    );
+
+                    $response = $this->httpPost("https://github.com/login/oauth/access_token", $postData);
+
+                    return;
+                }
+            }
+        }
+
+        // @todo: redirect to failure page
+    }
 
     private function generateState()
     {
