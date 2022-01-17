@@ -111,14 +111,12 @@ $router->mount("/oauth", function() use ($router) {
 $router->run();
 
 function requireAuth() {
-    // @todo
-
-    // if (!isset($_SESSION["AUTHENTICATED"]) || $_SESSION["AUTHENTICATED"] == false) {
-    //     http_response_code(401);
-    //     header("Content-Type: application/json; charset=utf-8");
-    //     echo json_encode(array("error" => "Not logged in"));
-    //     exit();
-    // }
+    if (!isset($_SESSION["AUTHENTICATED"]) || $_SESSION["AUTHENTICATED"] == false) {
+        http_response_code(401);
+        header("Content-Type: application/json; charset=utf-8");
+        echo json_encode(array("error" => "Not logged in"));
+        exit();
+    }
 }
 
 // function updateUserLastActiveTime() {
