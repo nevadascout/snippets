@@ -1,4 +1,5 @@
 api/vendor/
 composer.phar
+.env
 
 node_modules/
