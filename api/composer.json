@@ -1,0 +1,7 @@
+{
+    "require": {
+        "vlucas/phpdotenv": "^5.3",
+        "bramus/router": "^1.6",
+        "ircmaxell/random-lib": "^1.2"
+    }
+}
